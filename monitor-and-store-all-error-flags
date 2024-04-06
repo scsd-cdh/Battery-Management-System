@@ -16,19 +16,21 @@ void read_error_flags() {
     g_error_flags.error_detected = (P1IN & BIT0) ? true : false; // Assuming pin P1.0
 }
 
-// Function to store error flags
 void store_error_flags() {
     // Store error flag to non-volatile memory or transmit to OBC (example)
-    // Need to implement this function according to the system requirements
     
-    // Assuming each flag is represented by a single bit and transmitted to OBC
-    uint8_t stored_flags = g_error_flags.error_detected ? 0x01 : 0x00; // Convert boolean to bit
-    
-    // Transmit stored_flags to OBC, or store it in non-volatile memory
-    // Example: Send it over UART, SPI, I2C, or store it in EEPROM
-    // OBC receives this byte and interprets each bit as an error flag
-    // OBC then knows that a system reset happened based on the received error flag
+    // Check if error flag is true before storing
+    if (g_error_flags.error_detected) {
+        // If error flag is true, then store it
+        // Assuming each flag is represented by a single bit and transmitted to OBC
+        uint8_t stored_flags = 0x01; // Error flag is true, store it as 0x01
+        // Transmit stored_flags to OBC, or store it in non-volatile memory
+        // Example: Send it over UART, SPI, I2C, or store it in EEPROM
+        // OBC receives this byte and interprets each bit as an error flag
+        // OBC then knows that a system reset happened based on the received error flag
+    }
 }
+
 
 int main(void) {
    
