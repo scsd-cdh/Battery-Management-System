@@ -19,10 +19,11 @@ void read_error_flags() {
 // Function to store error flags
 void store_error_flags() {
     // Store error flag to non-volatile memory or transmit to OBC (example)
-    // You need to implement this function according to your system requirements
+    // Need to implement this function according to the system requirements
     
     // Assuming each flag is represented by a single bit and transmitted to OBC
     uint8_t stored_flags = g_error_flags.error_detected ? 0x01 : 0x00; // Convert boolean to bit
+    
     // Transmit stored_flags to OBC, or store it in non-volatile memory
     // Example: Send it over UART, SPI, I2C, or store it in EEPROM
     // OBC receives this byte and interprets each bit as an error flag
@@ -30,8 +31,11 @@ void store_error_flags() {
 }
 
 int main(void) {
-    // Stop watchdog timer
-    WDTCTL = WDTPW | WDTHOLD;
+   
+    // Stop watchdog timer:
+    // If system automatically resets upon detecting the error flags and doesnt get stuck or hanging afterwards ...
+    // then stopping the watchdog timer wouldnt be needed 
+    //WDTCTL = WDTPW | WDTHOLD;
 
     // Configure GPIO pin for error flag input
     P1DIR &= ~BIT0; // Set P1.0 as input
@@ -46,7 +50,7 @@ int main(void) {
         // Store error flag
         store_error_flags();
         
-        // Optional: Add delay or perform other operations
+        // Optional: Can add delay or perform other operations
     }
 
     return 0;
