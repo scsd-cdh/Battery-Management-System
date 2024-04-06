@@ -1,4 +1,3 @@
-
 #include <msp430.h>
 #include <stdint.h>
 
@@ -6,10 +5,10 @@
 void init_heater_pwm() {
     // Configure Timer A0 for PWM generation
     TA0CTL = TASSEL__SMCLK | MC__UP;     // SMCLK as source, up mode
-    TA0CCR0 = 1000 - 1;                   // PWM period (adjust as needed for your application)
+    TA0CCR0 = 1000 - 1;                   // PWM period (adjust as needed for the application)
     TA0CCTL1 = OUTMOD_7;                  // Reset/Set mode
     TA0CCR1 = 0;                          // Initialize duty cycle to 0
-    P1DIR |= BIT1;                        // P1.1 as PWM output (assuming you're using this pin for heater control)
+    P1DIR |= BIT1;                        // P1.1 as PWM output (assuming we're using this pin for heater control)
     P1SEL0 |= BIT1;                       // Select Timer A0.1 output on P1.1
 }
 
@@ -24,8 +23,9 @@ void set_heater_power(uint16_t duty_cycle) {
 }
 
 int main(void) {
-    // Stop watchdog timer
-    WDTCTL = WDTPW | WDTHOLD;
+    // Stop watchdog timer:
+    // If needed to stop the watchdog timer, can be done
+    //WDTCTL = WDTPW | WDTHOLD;
 
     // Initialize PWM for heater control
     init_heater_pwm();
@@ -35,7 +35,7 @@ int main(void) {
         // Example: Adjust heater power based on temperature readings or other criteria
         // Read temperature, adjust duty cycle accordingly
         // Example: 
-        set_heater_power(500); // Set duty cycle to 50% (adjust as needed)
+        set_heater_power(500); // Set duty cycle to 50% (adjust as needed to req.)
     }
 
     return 0;
