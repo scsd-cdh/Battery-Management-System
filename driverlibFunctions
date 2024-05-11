@@ -1,0 +1,61 @@
+#include <msp430.h>
+#include <driverlib.h>
+
+int main(void) {
+    // Stop watchdog timer if needed
+    //WDT_A_hold(WDT_A_BASE);
+
+    // Set Pin 1.0 as output
+    GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0);
+
+    // Infinite loop
+    while(1) {
+        // Toggle Pin 1.0
+        GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
+        
+        // Delay for some time
+        __delay_cycles(100000);
+    }
+
+    return 0;
+}
+
+
+/*Other driverlib example functions that can be used:
+
+GPIO Functions:
+GPIO_setAsInputPin()
+GPIO_setAsOutputPin()
+
+Timer Functions:
+Timer_A_configureUpMode()
+Timer_A_startCounter()
+
+Analog-to-Digital Converter (ADC) Functions:
+ADC_init()
+ADC_enable()
+
+Serial Communication (UART) Functions:
+UART_init()
+UART_enableModule()
+
+I2C Functions:
+EUSCI_B_I2C_initMaster()
+EUSCI_B_I2C_enable()
+
+SPI Functions:
+EUSCI_B_SPI_initMaster()
+EUSCI_B_SPI_enable()
+
+Interrupt Functions:
+Interrupt_enableInterrupt()
+Interrupt_disableInterrupt()
+
+Clock Functions:
+CS_initClock()
+CS_enableClockRequest()
+
+DMA Functions:
+DMA_enableTransfers()
+DMA_disableTransfers()
+*/
