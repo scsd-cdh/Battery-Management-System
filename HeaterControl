@@ -1,0 +1,61 @@
+#include <msp430.h>
+#include <stdint.h>
+#include "driverlib.h"
+
+// Function to initialize PWM for heater control
+void init_heater_pwm() {
+    // Stop watchdog timer to prevent from resetting the microcontroller unexpectedly
+    WDT_A_hold(WDT_A_BASE);
+
+    // Configure P1.1 as PWM output for the Timer A0 PWM signal, setting up the pin as a 
+    //peripheral function pin
+    GPIO_setAsPeripheralModuleFunctionOutputPin(
+        GPIO_PORT_P1,
+        GPIO_PIN1,
+        GPIO_PRIMARY_MODULE_FUNCTION
+    );
+
+    // Config. for Settting the timer A0 PWM period 
+    Timer_A_generatePWMParam pwmParams = {
+        TIMER_A_CLOCKSOURCE_SMCLK,          // Use SMCLK (sub-main clock as a source for Timer A0)
+        TIMER_A_CLOCKSOURCE_DIVIDER_1,      // No divider is applied to the clock source
+        1000,                               // PWM period (adjust as needed) before restting
+        TIMER_A_CAPTURECOMPARE_REGISTER_1,  // CCR1 for duty cycle, to capture/compare register used for setting the duty cycle
+        TIMER_A_OUTPUTMODE_RESET_SET,       // Reset/Set mode, the output is reset when the timer counts to the value in CCR1 and set when it resets to 0
+        0                                   // Initial duty cycle 0
+    };
+
+    Timer_A_generatePWM(TIMER_A0_BASE, &pwmParams); // initializes the PWM generation with the specified params
+}
+
+// Function to set heater power (duty cycle)
+void set_heater_power(uint16_t duty_cycle) {
+    // Limit duty cycle to prevent exceeding PWM period, ensuring that the duty cycle does not exceed the PWM period, preventing inavlid
+    // duty cycle values that could disrupt the PWM signal
+    if (duty_cycle > 1000) {
+        duty_cycle = 1000;
+    }
+
+    // Set the value of the capture/compare register CCR1 to the specified duty cycle. 
+    //Determining the proportion of the PWM period during which the signal is high
+    Timer_A_setCompareValue(
+        TIMER_A0_BASE,
+        TIMER_A_CAPTURECOMPARE_REGISTER_1,
+        duty_cycle
+    );
+}
+
+int main(void) {
+    // Initialize PWM for heater control
+    init_heater_pwm();
+
+    // Main loop
+    while (1) {
+        // Example: Adjust heater power based on temperature readings or other criteria
+        // Read temperature, adjust duty cycle accordingly
+        // Example: 
+        set_heater_power(500); // Set duty cycle to 50% (adjust as needed to req.)
+    }
+
+    return 0;
+}
