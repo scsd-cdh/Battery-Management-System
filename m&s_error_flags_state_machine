@@ -1,0 +1,77 @@
+#include <msp430.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include "driverlib.h"
+
+// Struct to hold error flags
+typedef struct {
+    bool error_detected;
+} ErrorFlags;
+
+// Global instance of error flags
+ErrorFlags g_error_flags = {0};
+
+// Enumeration for system states
+typedef enum {
+    STATE_IDLE,                      //waiting to detect an error
+    STATE_ERROR_DETECTED,            //an error is detected
+    STATE_STORE_ERROR                //error flag is stored or transmitted
+} SystemState;
+
+// Global variable for current state
+SystemState current_state = STATE_IDLE;
+
+// Function to read error flags
+void read_error_flags() {
+    g_error_flags.error_detected = GPIO_getInputPinValue(GPIO_PORT_P1, GPIO_PIN0) ? true : false;
+}
+
+// Function to store error flags
+void store_error_flags() {
+    if (g_error_flags.error_detected) {
+        uint8_t stored_flags = 0x01;
+        // Transmit or store stored_flags as needed
+    }
+}
+
+// State machine handler for transitions between states
+void state_machine() {
+    switch (current_state) {
+        case STATE_IDLE:
+            read_error_flags();
+            if (g_error_flags.error_detected) {
+                current_state = STATE_ERROR_DETECTED;
+            }
+            break;
+
+        case STATE_ERROR_DETECTED:
+            store_error_flags();
+            current_state = STATE_STORE_ERROR;
+            break;
+
+        case STATE_STORE_ERROR:
+            // After storing, go back to idle or handle accordingly
+            current_state = STATE_IDLE;
+            break;
+
+        default:
+            current_state = STATE_IDLE;
+            break;
+    }
+}
+
+int main(void) {
+    // Stop watchdog timer if needed
+    // WDT_A_hold(WDT_A_BASE);
+
+    // Configure GPIO pin for error flag input
+    GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P1, GPIO_PIN0);
+
+    // Main loop
+    while (1) {
+        state_machine();
+        // Can add delay or perform other operations
+    }
+
+    return 0;
+}
