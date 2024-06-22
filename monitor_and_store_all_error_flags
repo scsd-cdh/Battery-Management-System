@@ -1,0 +1,57 @@
+#include <msp430.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include "driverlib.h" //coming directly from Texas Instruments
+
+// Struct to hold error flags
+    //currently only has 1 error flag
+typedef struct {
+    bool error_detected;
+} ErrorFlags;
+
+// Global instance of error flags
+ErrorFlags g_error_flags = {0};
+
+// Function to read error flags
+void read_error_flags() {
+    // Read error flag from GPIO pin, if pin is high it sets 'error_detected' to true, otherwise its set to false
+    g_error_flags.error_detected = GPIO_getInputPinValue(GPIO_PORT_P1, GPIO_PIN0) ? true : false;
+}
+
+void store_error_flags() {
+    // Store error flag to non-volatile memory or transmit to OBC (example)
+    
+    // Check if error flag is true before storing
+    if (g_error_flags.error_detected) {
+        // If error flag is true, then store it
+        // Assuming each flag is represented by a single bit and transmitted to OBC
+        uint8_t stored_flags = 0x01; // Error flag is true, store it as 0x01
+        // Transmit stored_flags to OBC, or store it in non-volatile memory
+        // Example: Send it over UART, SPI, I2C, or store it in EEPROM
+        // OBC receives this byte and interprets each bit as an error flag
+        // OBC then knows that a system reset happened based on the received error flag
+    }
+}
+
+int main(void) {
+    // Stop watchdog timer:
+    // If system automatically resets upon detecting the error flags and doesn't get stuck or hanging afterwards ...
+    WDT_A_hold(WDT_A_BASE); // Stop watchdog timer if needed
+
+    // Configure GPIO pin for error flag input with an internal pull-up resistor,
+    //ensuring the pin is pulled high when not actively driven low, thus assuming the error signal is active low
+    GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P1, GPIO_PIN0);
+
+    // Main loop
+    while (1) {
+        // Read error flag
+        read_error_flags();
+
+        // Store error flag
+        store_error_flags();
+        
+        // Optional: Can add delay or perform other operations
+    }
+
+    return 0;
+}
