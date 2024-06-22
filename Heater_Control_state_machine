@@ -1,1 +1,125 @@
+#include <msp430.h>
+#include <stdint.h>
+#include "driverlib.h"
 
+// Enumeration for system states
+typedef enum {
+    STATE_INIT,
+    STATE_MEASURE_TEMPERATURE,
+    STATE_ADJUST_HEATER,
+    STATE_IDLE
+} SystemState;
+
+// Global variables
+SystemState current_state = STATE_INIT;
+int16_t measured_temperature = 0; // Placeholder for measured temperature
+
+// Function prototypes
+void init_heater_pwm();
+void set_heater_power(uint16_t duty_cycle);
+void measure_temperature();
+void adjust_heater_power();
+void state_machine();
+
+int main(void) {
+    // Stop watchdog timer to prevent from resetting the microcontroller unexpectedly
+    WDT_A_hold(WDT_A_BASE);
+
+    // Main loop
+    while (1) {
+        state_machine();
+        // Optional: Add delay or perform other operations
+    }
+
+    return 0;
+}
+
+// Function to initialize PWM for heater control
+void init_heater_pwm() {
+    // Configure P1.1 as PWM output for the Timer A0 PWM signal
+    GPIO_setAsPeripheralModuleFunctionOutputPin(
+        GPIO_PORT_P1,
+        GPIO_PIN1,
+        GPIO_PRIMARY_MODULE_FUNCTION
+    );
+
+    // Configuration for Timer A0 PWM period
+    Timer_A_generatePWMParam pwmParams = {
+        TIMER_A_CLOCKSOURCE_SMCLK,          // Use SMCLK (sub-main clock as a source for Timer A0)
+        TIMER_A_CLOCKSOURCE_DIVIDER_1,      // No divider is applied to the clock source
+        1000,                               // PWM period (adjust as needed) before restting
+        TIMER_A_CAPTURECOMPARE_REGISTER_1,  // CCR1 for duty cycle, to capture/compare register used for setting the duty cycle
+        TIMER_A_OUTPUTMODE_RESET_SET,       // Reset/Set mode, the output is reset when the timer counts to the value in CCR1 and set when it resets to 0
+        0                                   // Initial duty cycle 0
+    };
+
+    Timer_A_generatePWM(TIMER_A0_BASE, &pwmParams); // Initialize PWM generation with the specified parameters
+}
+
+// Function to set heater power (duty cycle)
+void set_heater_power(uint16_t duty_cycle) {
+    // Limit duty cycle to prevent exceeding PWM period
+    if (duty_cycle > 1000) {
+        duty_cycle = 1000;
+    }
+
+    // Set the value of the capture/compare register CCR1 to the specified duty cycle
+    Timer_A_setCompareValue(
+        TIMER_A0_BASE,
+        TIMER_A_CAPTURECOMPARE_REGISTER_1,
+        duty_cycle
+    );
+}
+
+// Function to measure temperature (example implementation)
+void measure_temperature() {
+    // Example: Read temperature from a sensor
+    // Replace with actual sensor reading code
+    // For example, reading from an analog input or using a sensor library
+    // Update measured_temperature with the actual temperature value
+    // Here, we're using a placeholder value 
+    measured_temperature = 25; // Example temperature in Celsius
+}
+
+// Function to adjust heater power based on measured temperature
+void adjust_heater_power() {
+    // Example: Simple proportional control
+    // Adjust duty cycle based on measured temperature
+    // a simplified example but would need to be replaced with the control algorithm
+    if (measured_temperature < 20) {
+        set_heater_power(300); // Example: 30% duty cycle
+    } else if (measured_temperature < 25) {
+        set_heater_power(500); // Example: 50% duty cycle
+    } else {
+        set_heater_power(700); // Example: 70% duty cycle
+    }
+}
+
+// State machine handler
+void state_machine() {
+    switch (current_state) {
+        case STATE_INIT:
+            init_heater_pwm();
+            current_state = STATE_MEASURE_TEMPERATURE;
+            break;
+
+        case STATE_MEASURE_TEMPERATURE:
+            measure_temperature();
+            current_state = STATE_ADJUST_HEATER;
+            break;
+
+        case STATE_ADJUST_HEATER:
+            adjust_heater_power();
+            current_state = STATE_IDLE;
+            break;
+
+        case STATE_IDLE:
+            // Optionally add delay or perform other operations
+            current_state = STATE_MEASURE_TEMPERATURE;
+            break;
+
+        default:
+            current_state = STATE_INIT;
+            break;
+    }
+}
