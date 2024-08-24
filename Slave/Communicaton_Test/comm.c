@@ -1,7 +1,7 @@
 #include "driverlib.h"
 #include "comm.h"
 
-extern uint8_t TXData;
+extern uint8_t * TXData;
 
 void cmd_receive(uint8_t data) {
     switch(mySm) {
@@ -19,10 +19,16 @@ void cmd_receive(uint8_t data) {
     }
 }
 
+uint8_t numbers[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
 void cmd_process(uint8_t cmd, uint8_t* payload,uint8_t payloadSize) {
     switch(cmd) {
         case SYSTEM_STATUS:
-            TXData = 48;
+            numbers[0] = 48;
+            numbers[1] = 49;
+            numbers[2] = 50;
+            numbers[3] = 51;
+            TXData = numbers;
             break;
         case HEALTH_CHECK:
             break;

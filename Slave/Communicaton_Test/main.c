@@ -84,7 +84,7 @@
 #define SLAVE_ADDRESS 0x08
 
 uint8_t RXData;
-uint8_t TXData = 0x00;
+uint8_t * TXData;
 
 void main(void)
 {
@@ -149,7 +149,6 @@ void USCIB0_ISR(void)
         case USCI_I2C_UCSTTIFG:     // START condition detected with own address (slave mode only)
             break;
         case USCI_I2C_UCSTPIFG:     // STOP condition detected (master & slave mode)
-//            TXData++;
             break;
         case USCI_I2C_UCRXIFG3:     // RXIFG3
             break;
@@ -180,8 +179,10 @@ void USCIB0_ISR(void)
             break;
         case USCI_I2C_UCTXIFG0:     // TXIFG0
             EUSCI_B_I2C_slavePutData(EUSCI_B0_BASE,
-                TXData
+                *TXData
                 );
+            *TXData = 127;
+            TXData++;
 
             break;
         case USCI_I2C_UCBCNTIFG:    // Byte count limit reached (UCBxTBCNT)
