@@ -9,7 +9,7 @@
 #define COMM_H_
 
 typedef enum{
-    NONE = 0x00,
+    IDLE = 0x00,
     SYSTEM_STATUS = 0x01,
     HEALTH_CHECK = 0x02,
     FLAGS = 0x03,
@@ -20,21 +20,20 @@ typedef enum{
 
 } cmdID_t;
 
-typedef enum {
-    IDLE = 0,
-    CMD_RECV,
-} cmdSM_t;
+typedef enum{
+    AWAITING = 0,
+    RECEIVED = 1
+} cmdStatus_t;
 
-static uint8_t payload_sizes[MAX_CMD_T] = {0, 1, 16, 2, 5, 1, 2}; //fix payload sizes
-
-static cmdSM_t mySm = IDLE;
-static cmdID_t myCmd = NONE;
+static uint8_t payload_sizes[MAX_CMD_T] = {0, 0, 16, 2, 5, 1, 2}; //fix payload sizes
+static cmdStatus_t cmdStatus = AWAITING;
+static cmdID_t myCmd = IDLE;
 static uint8_t myPayload[32] = {0};
 static uint8_t myPayloadSize = 0;
 static uint8_t counterN = 0;
 
 void cmd_receive(uint8_t data);
-void cmd_process(uint8_t cmd, uint8_t* payload,uint8_t payloadSize);
+void cmd_process();
 
 
 

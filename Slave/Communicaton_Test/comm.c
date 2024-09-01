@@ -1,44 +1,77 @@
 #include "driverlib.h"
+#include "global_var.h"
 #include "comm.h"
+#include "setup.h"
 
-extern uint8_t * TXData;
+uint8_t data;
 
 void cmd_receive(uint8_t data) {
-    switch(mySm) {
-    case IDLE:
+    switch(cmdStatus) {
+    case AWAITING:
         myCmd = (cmdID_t) data;
-        mySm = CMD_RECV;
-    case CMD_RECV:
         myPayloadSize = payload_sizes[myCmd];
-        counterN = 0;
+
+        if (myPayloadSize==0){
+            cmdStatus = AWAITING;
+        }else{
+            cmdStatus = RECEIVED;
+        }
+
+        break;
+    case RECEIVED:
         myPayload[counterN++] = data;
         if (myPayloadSize == counterN) {
-            cmd_process(myCmd, myPayload, N);
-            mySm = IDLE;
+            counterN = 0;
+            cmdStatus = AWAITING;
         }
+        break;
     }
 }
 
-uint8_t numbers[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+uint8_t numbers[32] = {60,61,62,63,64,65,66,67,68,69,70,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
-void cmd_process(uint8_t cmd, uint8_t* payload,uint8_t payloadSize) {
-    switch(cmd) {
+int blow = 0;
+
+void cmd_process() {
+    switch(myCmd) {
+        case IDLE:
+            if (blow >3){
+                GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0);
+
+                GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN0);
+            }
+            blow++;
+            resumeI2CInterrupts();
+            break;
         case SYSTEM_STATUS:
             numbers[0] = 48;
             numbers[1] = 49;
             numbers[2] = 50;
             numbers[3] = 51;
             TXData = numbers;
+//            blow++;
+
+            myCmd = IDLE;
             break;
         case HEALTH_CHECK:
+
+            myCmd = IDLE;
             break;
         case FLAGS:
+
+            myCmd = IDLE;
             break;
         case POWER_STATUS:
+
+            myCmd = IDLE;
             break;
         case HEATERS_CONTROLLER:
+
+            myCmd = IDLE;
             break;
         case TELECOMMAND_ACKNOWLEDGE:
+
+            myCmd = IDLE;
             break;
     }
 }

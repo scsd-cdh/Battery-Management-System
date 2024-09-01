@@ -10,26 +10,32 @@ CMD_SRCS += \
 
 C_SRCS += \
 ../comm.c \
-../main.c 
+../main.c \
+../setup.c 
 
 C_DEPS += \
 ./comm.d \
-./main.d 
+./main.d \
+./setup.d 
 
 OBJS += \
 ./comm.obj \
-./main.obj 
+./main.obj \
+./setup.obj 
 
 OBJS__QUOTED += \
 "comm.obj" \
-"main.obj" 
+"main.obj" \
+"setup.obj" 
 
 C_DEPS__QUOTED += \
 "comm.d" \
-"main.d" 
+"main.d" \
+"setup.d" 
 
 C_SRCS__QUOTED += \
 "../comm.c" \
-"../main.c" 
+"../main.c" \
+"../setup.c" 
 
 
