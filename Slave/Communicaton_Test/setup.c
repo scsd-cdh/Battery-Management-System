@@ -125,20 +125,22 @@ void init_I2C(){
 
 //        __bis_SR_register(CPUOFF + GIE);        // Enter LPM0 w/ interrupts
 //        __no_operation();
+
 }
 
 void suspendI2CInterrupts() {
     EUSCI_B_I2C_disableInterrupt(EUSCI_B0_BASE,
-         EUSCI_B_I2C_RECEIVE_INTERRUPT0
+         EUSCI_B_I2C_RECEIVE_INTERRUPT0 + EUSCI_B_I2C_TRANSMIT_INTERRUPT0 + EUSCI_B_I2C_STOP_INTERRUPT
          );
 }
 
 void resumeI2CInterrupts() {
-//    EUSCI_B_I2C_enableInterrupt(EUSCI_B0_BASE,
-//        EUSCI_B_I2C_RECEIVE_INTERRUPT0
-//        );
+    EUSCI_B_I2C_enableInterrupt(EUSCI_B0_BASE,
+        EUSCI_B_I2C_RECEIVE_INTERRUPT0 + EUSCI_B_I2C_TRANSMIT_INTERRUPT0 + EUSCI_B_I2C_STOP_INTERRUPT
+        );
     __bis_SR_register(CPUOFF + GIE); // Enter LPM with interrupts
 }
+
 
 #if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
 #pragma vector=USCI_B0_VECTOR
@@ -148,6 +150,11 @@ __attribute__((interrupt(USCI_B0_VECTOR)))
 #endif
 void USCIB0_ISR(void)
 {
+
+//    static uint8_t * incoming_Data = myPayload;
+    static uint8_t incoming_data_index = 0;
+    static uint8_t rcving_Data = 0;
+
     switch(__even_in_range(UCB0IV, USCI_I2C_UCBIT9IFG))
     {
         case USCI_NONE:             // No interrupts break;
@@ -157,8 +164,16 @@ void USCIB0_ISR(void)
         case USCI_I2C_UCNACKIFG:    // NAK received (master only)
             break;
         case USCI_I2C_UCSTTIFG:     // START condition detected with own address (slave mode only)
+
             break;
         case USCI_I2C_UCSTPIFG:     // STOP condition detected (master & slave mode)
+
+            incoming_data_index = 0;
+            if (rcving_Data==1){
+                rcving_Data = 0;
+                cmd_receive();
+            }
+
             break;
         case USCI_I2C_UCRXIFG3:     // RXIFG3
             break;
@@ -173,6 +188,8 @@ void USCIB0_ISR(void)
         case USCI_I2C_UCTXIFG1:     // TXIFG1
             break;
         case USCI_I2C_UCRXIFG0:     // RXIFG0
+//            suspendI2CInterrupts(); // Commenting this allowed us to send data the case "USCI_I2C_UCTXIFG0"
+            __bic_SR_register_on_exit(CPUOFF);
 
             RXData = EUSCI_B_I2C_slaveGetData(EUSCI_B0_BASE);
 //            if (RXData == 0x01){
@@ -185,17 +202,18 @@ void USCIB0_ISR(void)
 //                GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
 //            }
 
-//            suspendI2CInterrupts();
-            __bic_SR_register_on_exit(CPUOFF);
-
-            cmd_receive(RXData);
+//            *incoming_Data = RXData;
+//            incoming_Data++;
+            myPayload[incoming_data_index++] = RXData;
+            rcving_Data = 1;
 
             break;
         case USCI_I2C_UCTXIFG0:     // TXIFG0
+            __bic_SR_register_on_exit(CPUOFF);
+
             EUSCI_B_I2C_slavePutData(EUSCI_B0_BASE,
                 *TXData
                 );
-//            *TXData = 60;
             TXData++;
 
             break;

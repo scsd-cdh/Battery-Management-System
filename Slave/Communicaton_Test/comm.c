@@ -5,42 +5,17 @@
 
 uint8_t data;
 
-void cmd_receive(uint8_t data) {
-    switch(cmdStatus) {
-    case AWAITING:
-        myCmd = (cmdID_t) data;
-        myPayloadSize = payload_sizes[myCmd];
+void cmd_receive() {
 
-        if (myPayloadSize==0){
-            cmdStatus = AWAITING;
-        }else{
-            cmdStatus = RECEIVED;
-        }
-
-        break;
-    case RECEIVED:
-        myPayload[counterN++] = data;
-        if (myPayloadSize == counterN) {
-            counterN = 0;
-            cmdStatus = AWAITING;
-        }
-        break;
-    }
+    current_Statemachine = (cmdID_t) myPayload[0];
 }
 
 uint8_t numbers[32] = {60,61,62,63,64,65,66,67,68,69,70,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
-int blow = 0;
-
 void cmd_process() {
-    switch(myCmd) {
-        case IDLE:
-            if (blow >3){
-                GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0);
 
-                GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN0);
-            }
-            blow++;
+    switch(current_Statemachine) {
+        case IDLE:
             resumeI2CInterrupts();
             break;
         case SYSTEM_STATUS:
@@ -49,29 +24,31 @@ void cmd_process() {
             numbers[2] = 50;
             numbers[3] = 51;
             TXData = numbers;
-//            blow++;
 
-            myCmd = IDLE;
+            current_Statemachine = IDLE;
             break;
         case HEALTH_CHECK:
 
-            myCmd = IDLE;
+            TXData = myPayload;
+//            TXData++;
+
+            current_Statemachine = IDLE;
             break;
         case FLAGS:
 
-            myCmd = IDLE;
+            current_Statemachine = IDLE;
             break;
         case POWER_STATUS:
 
-            myCmd = IDLE;
+            current_Statemachine = IDLE;
             break;
         case HEATERS_CONTROLLER:
 
-            myCmd = IDLE;
+            current_Statemachine = IDLE;
             break;
         case TELECOMMAND_ACKNOWLEDGE:
 
-            myCmd = IDLE;
+            current_Statemachine = IDLE;
             break;
     }
 }

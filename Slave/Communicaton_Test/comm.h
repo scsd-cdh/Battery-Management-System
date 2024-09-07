@@ -11,28 +11,26 @@
 typedef enum{
     IDLE = 0x00,
     SYSTEM_STATUS = 0x01,
-    HEALTH_CHECK = 0x02,
+    HEALTH_CHECK = 0x22,
     FLAGS = 0x03,
     POWER_STATUS = 0x04,
     HEATERS_CONTROLLER = 0x05,
     TELECOMMAND_ACKNOWLEDGE = 0x06,
-    MAX_CMD_T = 0x07
 
 } cmdID_t;
 
+#define MAX_CMD_T 0x07
+
 typedef enum{
     AWAITING = 0,
-    RECEIVED = 1
+    RECEIVING = 1
 } cmdStatus_t;
 
-static uint8_t payload_sizes[MAX_CMD_T] = {0, 0, 16, 2, 5, 1, 2}; //fix payload sizes
+static uint8_t payload_sizes[MAX_CMD_T] = {0, 0, 1, 2, 5, 1, 2}; //fix payload sizes
 static cmdStatus_t cmdStatus = AWAITING;
-static cmdID_t myCmd = IDLE;
-static uint8_t myPayload[32] = {0};
-static uint8_t myPayloadSize = 0;
-static uint8_t counterN = 0;
+static cmdID_t current_Statemachine = IDLE;
 
-void cmd_receive(uint8_t data);
+void cmd_receive();
 void cmd_process();
 
 

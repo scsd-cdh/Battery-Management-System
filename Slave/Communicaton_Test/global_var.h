@@ -13,6 +13,8 @@
 extern uint8_t RXData;
 extern uint8_t * TXData;
 extern uint8_t numbers[32];
+extern uint8_t myPayload[32];
+
 
 
 

@@ -4,7 +4,7 @@
 
 SHELL = cmd.exe
 
-CG_TOOL_ROOT := C:/ti/ccs1271/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS
+CG_TOOL_ROOT := C:/ti/ccs1280/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS
 
 GEN_OPTS__FLAG := 
 GEN_CMDS__FLAG := 
@@ -161,21 +161,21 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXE_OUTPUTS += \
-Communicaton_Test.out 
+BMS_LOL.out 
 
 EXE_OUTPUTS__QUOTED += \
-"Communicaton_Test.out" 
+"BMS_LOL.out" 
 
 
 # All Target
 all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
-	@$(MAKE) --no-print-directory -Onone "Communicaton_Test.out"
+	@$(MAKE) --no-print-directory -Onone "BMS_LOL.out"
 
 # Tool invocations
-Communicaton_Test.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+BMS_LOL.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: MSP430 Linker'
-	"C:/ti/ccs1271/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/bin/cl430" -vmspx --data_model=restricted -Ooff --opt_for_speed=1 --use_hw_mpy=F5 --advice:power="none" --advice:hw_config=all --define=__MSP430FR5969__ --define=DEPRECATED --define=_MPU_ENABLE -g --printf_support=minimal --diag_warning=225 --diag_wrap=off --display_error_number --silicon_errata=CPU21 --silicon_errata=CPU22 --silicon_errata=CPU40 -z -m"Communicaton_Test.map" --heap_size=160 --stack_size=160 --cinit_hold_wdt=on -i"C:/ti/ccs1271/ccs/ccs_base/msp430/include" -i"C:/ti/ccs1271/ccs/ccs_base/msp430/lib/5xx_6xx_FRxx" -i"C:/ti/ccs1271/ccs/ccs_base/msp430/lib/FR59xx" -i"C:/ti/ccs1271/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/lib" -i"C:/ti/ccs1271/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include" --priority --reread_libs --define=_MPU_ENABLE --diag_wrap=off --display_error_number --warn_sections --xml_link_info="Communicaton_Test_linkInfo.xml" --use_hw_mpy=F5 --rom_model -o "Communicaton_Test.out" $(ORDERED_OBJS)
+	"C:/ti/ccs1280/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/bin/cl430" -vmspx --data_model=restricted -Ooff --opt_for_speed=1 --use_hw_mpy=F5 --advice:power="none" --advice:hw_config=all --define=__MSP430FR5969__ --define=DEPRECATED --define=_MPU_ENABLE -g --printf_support=minimal --diag_warning=225 --diag_wrap=off --display_error_number --silicon_errata=CPU21 --silicon_errata=CPU22 --silicon_errata=CPU40 -z -m"BMS_LOL.map" --heap_size=160 --stack_size=160 --cinit_hold_wdt=on -i"C:/ti/ccs1280/ccs/ccs_base/msp430/include" -i"C:/ti/ccs1280/ccs/ccs_base/msp430/lib/5xx_6xx_FRxx" -i"C:/ti/ccs1280/ccs/ccs_base/msp430/lib/FR59xx" -i"C:/ti/ccs1280/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/lib" -i"C:/ti/ccs1280/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include" --priority --reread_libs --define=_MPU_ENABLE --diag_wrap=off --display_error_number --warn_sections --xml_link_info="BMS_LOL_linkInfo.xml" --use_hw_mpy=F5 --rom_model -o "BMS_LOL.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 

@@ -12,7 +12,7 @@
 	<rts value="libc.a"/>
 	<createSlaveProjects value=""/>
 	<templateProperties value="id=eusci_b_i2c_ex4_slaveRxSingle.projectspec.eusci_b_i2c_ex4_slaveRxSingle"/>
-	<origin value="C:/Users/Amro/Downloads/BMS"/>
+	<origin value="C:/Users/space/Downloads/Communicaton_Test"/>
 	<filesToOpen value=""/>
 	<connection value="common/targetdb/connections/TIMSP430-USB.xml"/>
 	<isTargetManual value="false"/>
