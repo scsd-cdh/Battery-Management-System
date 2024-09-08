@@ -84,6 +84,7 @@
 //
 //*****************************************************************************
 
+
 void init_I2C(){
     WDT_A_hold(WDT_A_BASE);
 
@@ -155,6 +156,7 @@ void USCIB0_ISR(void)
     static uint8_t incoming_data_index = 0;
     static uint8_t rcving_Data = 0;
 
+
     switch(__even_in_range(UCB0IV, USCI_I2C_UCBIT9IFG))
     {
         case USCI_NONE:             // No interrupts break;
@@ -168,11 +170,13 @@ void USCIB0_ISR(void)
             break;
         case USCI_I2C_UCSTPIFG:     // STOP condition detected (master & slave mode)
 
-            incoming_data_index = 0;
-            if (rcving_Data==1){
-                rcving_Data = 0;
-                cmd_receive();
-            }
+         //   incoming_data_index = 0;
+            //if (rcving_Data==1){
+            myPayload[incoming_data_index] = EUSCI_B_I2C_slaveGetData(EUSCI_B0_BASE);
+
+            rcving_Data = 0;
+            cmd_receive();
+           // }
 
             break;
         case USCI_I2C_UCRXIFG3:     // RXIFG3
@@ -190,6 +194,10 @@ void USCIB0_ISR(void)
         case USCI_I2C_UCRXIFG0:     // RXIFG0
 //            suspendI2CInterrupts(); // Commenting this allowed us to send data the case "USCI_I2C_UCTXIFG0"
             __bic_SR_register_on_exit(CPUOFF);
+
+            if(rcving_Data == 0){
+                incoming_data_index = 0;
+            }
 
             RXData = EUSCI_B_I2C_slaveGetData(EUSCI_B0_BASE);
 //            if (RXData == 0x01){
